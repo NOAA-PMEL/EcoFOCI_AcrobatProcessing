@@ -64,7 +64,7 @@ class Acrobat_GPS(object):
 		return BytesIO(buf.strip())
 
 	@staticmethod	
-	def parse(fobj, sal_output=False, press_output=False, **kwargs):
+	def parse(fobj, **kwargs):
 		r"""
 		Method to parse gps data from ACROBAT
 		"""
@@ -89,7 +89,7 @@ class Acrobat_GPS(object):
 										ignore_index=True)
 
 		rawdata = rawdata.set_index(pd.DatetimeIndex(rawdata['DateTime']))
-		print rawdata.resample('s').mean().to_csv()
+		print rawdata.resample('1s',label='right',closed='right').mean().to_csv()
 
 class Acrobat_FastCAT(object):
 
@@ -112,10 +112,39 @@ class Acrobat_FastCAT(object):
 		Method to parse FastCat data from ACROBAT
 		"""
 
-		rawdata = pd.read_csv(fobj, names=['DateTime','Temperature','Conductivity','Pressure'])       
+		rawdata = pd.read_csv(fobj, names=['DateTime','Temperature','Conductivity','Pressure'], usecols=[0,1,3,5,7])       
 		rawdata.DateTime = pd.to_datetime(rawdata.DateTime,format='%Y-%m-%dT%H:%M:%S')
 		rawdata = rawdata.set_index(pd.DatetimeIndex(rawdata['DateTime']))
-		print rawdata.resample('s').mean().to_csv()
+		print rawdata.resample('1s',label='right',closed='right').mean().to_csv()
+
+class Acrobat_ECOTriplet(object):
+
+	@staticmethod
+	def get_data(filename=None, **kwargs):
+		r"""
+		Basic Method to open files.  Specific actions can be passes as kwargs for instruments
+		"""
+
+		fobj = open(filename)
+		data = fobj.read()
+
+
+		buf = data
+		return BytesIO(buf.strip())
+
+	@staticmethod	
+	def parse(fobj, **kwargs):
+		r"""
+		Method to parse FastCat data from ACROBAT
+		"""
+
+		rawdata = pd.read_csv(fobj, names=['DateTime','EcoDate','EcoTime','700nm','695nm','460nm'],
+									usecols=[0,1,2,4,6,8],sep='\s+|,',engine='python')       
+		rawdata.DateTime = pd.to_datetime(rawdata.DateTime,format='%Y-%m-%dT%H:%M:%S')
+		#rawdata.EcoDateTime = pd.to_datetime(rawdata.EcoDateTime,format='%m/%d/%y %H:%M:%S')
+		rawdata = rawdata.set_index(pd.DatetimeIndex(rawdata['DateTime']))
+		print rawdata.resample('1s',label='right',closed='right').mean().to_csv()
+
 
 """--------------------------------------------------------------------------------------"""
 parser = argparse.ArgumentParser(description='CTD plots')
@@ -130,5 +159,7 @@ if args.Instrument in ['GPS','gps']:
 	get_inst_data(args.DataPath, source=Acrobat_GPS)
 elif args.Instrument in ['fastcat','FastCAT']:
 	get_inst_data(args.DataPath, source=Acrobat_FastCAT)
+elif args.Instrument in ['ECOTriplet']:
+	get_inst_data(args.DataPath, source=Acrobat_ECOTriplet)
 else:
 	print "Instrument not identified.  See commandline help for options"
