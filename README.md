@@ -16,7 +16,7 @@ For the AQ1601 Cruise, the following instruments where part of the ACROBAT Packa
 
 This will create concatenated data files with 1s resolution.  It is a messy collection of files and each needs to be cleaned at the moment (manually).
 Issues to clean:
-- many blank lines where no data was recorded but the data capture routine was running.
+- many blank lines where no data was recorded but the data capture routine was running. ()
 - instances when the instrument was not setup properly and not all data was obtained (often can be seen by errors in headers)
 
 2. run the data combine/merge routines.

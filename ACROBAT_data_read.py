@@ -112,8 +112,11 @@ class Acrobat_FastCAT(object):
 		Method to parse FastCat data from ACROBAT
 		"""
 
-		rawdata = pd.read_csv(fobj, names=['DateTime','Temperature','Conductivity','Pressure'], usecols=[0,1,3,5,7])       
+		rawdata = pd.read_csv(fobj, names=['DateTime','Temperature','Conductivity','Pressure'])       
 		rawdata.DateTime = pd.to_datetime(rawdata.DateTime,format='%Y-%m-%dT%H:%M:%S')
+		rawdata['Temperature'] = pd.to_numeric(rawdata['Temperature'],errors='coerce',downcast='float')
+		rawdata['Conductivity'] = pd.to_numeric(rawdata['Conductivity'],errors='coerce',downcast='float')
+		rawdata['Pressure'] = pd.to_numeric(rawdata['Pressure'],errors='coerce',downcast='float')
 		rawdata = rawdata.set_index(pd.DatetimeIndex(rawdata['DateTime']))
 		print rawdata.resample('1s',label='right',closed='right').mean().to_csv()
 
@@ -137,11 +140,17 @@ class Acrobat_ECOTriplet(object):
 		r"""
 		Method to parse FastCat data from ACROBAT
 		"""
+		#columns = ['DateTime','EcoDate','EcoTime','700nm','695nm','460nm']
+		#columns_ind = [0,1,2,4,6,8]
+		##use following if gps feed exists... rely on gps for time syncing
+		columns = ['DateTime','700nm','695nm','460nm']
+		columns_ind = [0,4,6,8]		
 
-		rawdata = pd.read_csv(fobj, names=['DateTime','EcoDate','EcoTime','700nm','695nm','460nm'],
-									usecols=[0,1,2,4,6,8],sep='\s+|,',engine='python')       
+		rawdata = pd.read_csv(fobj, names=columns, usecols=columns_ind,sep='\s+|,',engine='python')       
 		rawdata.DateTime = pd.to_datetime(rawdata.DateTime,format='%Y-%m-%dT%H:%M:%S')
-		#rawdata.EcoDateTime = pd.to_datetime(rawdata.EcoDateTime,format='%m/%d/%y %H:%M:%S')
+		rawdata['700nm'] = pd.to_numeric(rawdata['460nm'],errors='coerce',downcast='integer')
+		rawdata['695nm'] = pd.to_numeric(rawdata['460nm'],errors='coerce',downcast='integer')
+		rawdata['460nm'] = pd.to_numeric(rawdata['460nm'],errors='coerce',downcast='integer')
 		rawdata = rawdata.set_index(pd.DatetimeIndex(rawdata['DateTime']))
 		print rawdata.resample('1s',label='right',closed='right').mean().to_csv()
 
