@@ -89,7 +89,7 @@ class Acrobat_GPS(object):
 										ignore_index=True)
 
 		rawdata = rawdata.set_index(pd.DatetimeIndex(rawdata['DateTime']))
-		print rawdata.resample('1s',label='right',closed='right').mean().to_csv()
+		print rawdata.resample('1s',label='right',closed='right').mean().interpolate().to_csv()
 
 class Acrobat_FastCAT(object):
 
@@ -118,7 +118,7 @@ class Acrobat_FastCAT(object):
 		rawdata['Conductivity'] = pd.to_numeric(rawdata['Conductivity'],errors='coerce',downcast='float')
 		rawdata['Pressure'] = pd.to_numeric(rawdata['Pressure'],errors='coerce',downcast='float')
 		rawdata = rawdata.set_index(pd.DatetimeIndex(rawdata['DateTime']))
-		print rawdata.resample('1s',label='right',closed='right').mean().to_csv()
+		print rawdata.resample('1s',label='right',closed='right').mean().interpolate().to_csv()
 
 class Acrobat_ECOTriplet(object):
 
@@ -152,7 +152,7 @@ class Acrobat_ECOTriplet(object):
 		rawdata['695nm'] = pd.to_numeric(rawdata['460nm'],errors='coerce',downcast='integer')
 		rawdata['460nm'] = pd.to_numeric(rawdata['460nm'],errors='coerce',downcast='integer')
 		rawdata = rawdata.set_index(pd.DatetimeIndex(rawdata['DateTime']))
-		print rawdata.resample('1s',label='right',closed='right').mean().to_csv()
+		print rawdata.resample('1s',label='right',closed='right').mean().interpolate().to_csv()
 
 
 """--------------------------------------------------------------------------------------"""
