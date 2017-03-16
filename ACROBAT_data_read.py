@@ -12,6 +12,7 @@
  
  History:
  --------
+ 2017-03-16 - S.BELL: Add second pass option to files
 
 """
 import datetime
@@ -21,14 +22,15 @@ import argparse
 from io import BytesIO
 
 
-def get_inst_data(filename, **kwargs):
+def get_inst_data(filename, passnumber='first', **kwargs):
 	r"""
 
 	Parameters
 	----------
 	filename : string
 		complete path to file to be ingested
-
+	passnumber : string
+		'first','second'
 	kwargs
 		Arbitrary keyword arguments to use to initialize source
 
@@ -43,10 +45,16 @@ def get_inst_data(filename, **kwargs):
 			value:	float, int, string (depending on instrument)
 
 	"""
-	src = kwargs['source']
-	fobj = src.get_data(filename)
-	Dataset = src.parse(fobj, **kwargs)
-
+	if passnumber == 'first':
+		src = kwargs['source']
+		fobj = src.get_data(filename)
+		Dataset = src.parse(fobj, **kwargs)
+	elif passnumber == 'second':
+		src = kwargs['source']
+		fobj = src.get_data(filename)
+		Dataset = src.parse_second(fobj, **kwargs)
+	else:
+		raise RuntimeError('Invalid passnumber')
 
 class Acrobat_GPS(object):
 
@@ -91,6 +99,16 @@ class Acrobat_GPS(object):
 		rawdata = rawdata.set_index(pd.DatetimeIndex(rawdata['DateTime']))
 		print rawdata.resample('1s',label='right',closed='right').mean().interpolate().to_csv()
 
+	@staticmethod	
+	def parse_second(fobj, **kwargs):
+		r"""
+		Method to parse gps data from ACROBAT after first pass
+		"""
+		rawdata = pd.read_csv(fobj)       
+		rawdata.DateTime = pd.to_datetime(rawdata.DateTime,format='%Y-%m-%d %H:%M:%S')
+		rawdata = rawdata.set_index(pd.DatetimeIndex(rawdata['DateTime']))
+		print rawdata.resample('1s',label='right',closed='right').mean().interpolate().to_csv()
+
 class Acrobat_FastCAT(object):
 
 	@staticmethod
@@ -117,6 +135,16 @@ class Acrobat_FastCAT(object):
 		rawdata['Temperature'] = pd.to_numeric(rawdata['Temperature'],errors='coerce',downcast='float')
 		rawdata['Conductivity'] = pd.to_numeric(rawdata['Conductivity'],errors='coerce',downcast='float')
 		rawdata['Pressure'] = pd.to_numeric(rawdata['Pressure'],errors='coerce',downcast='float')
+		rawdata = rawdata.set_index(pd.DatetimeIndex(rawdata['DateTime']))
+		print rawdata.resample('1s',label='right',closed='right').mean().interpolate().to_csv()
+
+	@staticmethod	
+	def parse_second(fobj, **kwargs):
+		r"""
+		Method to parse gps data from ACROBAT after first pass
+		"""
+		rawdata = pd.read_csv(fobj)       
+		rawdata.DateTime = pd.to_datetime(rawdata.DateTime,format='%Y-%m-%d %H:%M:%S')
 		rawdata = rawdata.set_index(pd.DatetimeIndex(rawdata['DateTime']))
 		print rawdata.resample('1s',label='right',closed='right').mean().interpolate().to_csv()
 
@@ -154,6 +182,15 @@ class Acrobat_ECOTriplet(object):
 		rawdata = rawdata.set_index(pd.DatetimeIndex(rawdata['DateTime']))
 		print rawdata.resample('1s',label='right',closed='right').mean().interpolate().to_csv()
 
+	@staticmethod	
+	def parse_second(fobj, **kwargs):
+		r"""
+		Method to parse gps data from ACROBAT after first pass
+		"""
+		rawdata = pd.read_csv(fobj)       
+		rawdata.DateTime = pd.to_datetime(rawdata.DateTime,format='%Y-%m-%d %H:%M:%S')
+		rawdata = rawdata.set_index(pd.DatetimeIndex(rawdata['DateTime']))
+		print rawdata.resample('1s',label='right',closed='right').mean().interpolate().to_csv()
 
 """--------------------------------------------------------------------------------------"""
 parser = argparse.ArgumentParser(description='CTD plots')
@@ -161,14 +198,26 @@ parser.add_argument('DataPath', metavar='DataPath', type=str,
 	help='full path to directory of processed nc files')
 parser.add_argument('Instrument', metavar='Instrument', type=str,
 	help='choose: GPS, FastCAT, SUNA, ECOTriplet')
+parser.add_argument('-sp','--second_pass', action="store_true",
+    help='second round of parsing if chosen')
 
 args = parser.parse_args()
 
-if args.Instrument in ['GPS','gps']:
-	get_inst_data(args.DataPath, source=Acrobat_GPS)
-elif args.Instrument in ['fastcat','FastCAT']:
-	get_inst_data(args.DataPath, source=Acrobat_FastCAT)
-elif args.Instrument in ['ECOTriplet']:
-	get_inst_data(args.DataPath, source=Acrobat_ECOTriplet)
+if not args.second_pass:
+	if args.Instrument in ['GPS','gps']:
+		get_inst_data(args.DataPath, source=Acrobat_GPS)
+	elif args.Instrument in ['fastcat','FastCAT']:
+		get_inst_data(args.DataPath, source=Acrobat_FastCAT)
+	elif args.Instrument in ['ECOTriplet']:
+		get_inst_data(args.DataPath, source=Acrobat_ECOTriplet)
+	else:
+		print "Instrument not identified.  See commandline help for options"
 else:
-	print "Instrument not identified.  See commandline help for options"
+	if args.Instrument in ['GPS','gps']:
+		get_inst_data(args.DataPath, source=Acrobat_GPS, passnumber='second')
+	elif args.Instrument in ['fastcat','FastCAT']:
+		get_inst_data(args.DataPath, source=Acrobat_FastCAT, passnumber='second')
+	elif args.Instrument in ['ECOTriplet']:
+		get_inst_data(args.DataPath, source=Acrobat_ECOTriplet, passnumber='second')
+	else:
+		print "Instrument not identified.  See commandline help for options"	
