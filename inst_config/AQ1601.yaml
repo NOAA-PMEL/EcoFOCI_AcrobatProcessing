@@ -1,0 +1,40 @@
+--- 
+SBE_Temp_Coeffs:
+  g: 4.40780081e-003
+  h: 6.36263905e-004
+  i: 2.49551995e-005
+  j: 2.97852303e-006
+  f0: 1000.0
+  Serial_Number: 0287
+
+SBE_Cond_Coeffs:
+  g: -9.70711977
+  h: +1.12844753
+  i: -1.43073826e-003
+  j: +1.82789061e-004
+  CPcor: -9.5700e-008
+  CTcor: +3.2500e-006
+  Serial_Number: 0287
+
+Wetlabs_CHL_Coeffs:
+  ScaleFactor: 0.0120
+  DarkCounts: 47
+  Units: microgram/liter
+  Serial_Number: BB2FLVMT-739
+Wetlabs_700nm_Coeffs:
+  ScaleFactor: 3.313e-06
+  DarkCounts: 52
+  Units: m-1 sr-1
+  Serial_Number: BB2FLVMT-739
+Wetlabs_470nm_Coeffs:
+  ScaleFactor: 1.261e-05
+  DarkCounts: 47
+  Units: m-1 sr-1
+  Serial_Number: BB2FLVMT-739
+
+Upward_PAR:
+  Serial_Number: 
+Downward_PAR:
+  Serial_Number: 
+OxygenSensor:
+  Serial_Number: 602

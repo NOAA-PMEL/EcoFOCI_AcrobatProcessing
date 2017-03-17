@@ -89,9 +89,45 @@ def pyini2yaml(infile, default_flow_style=False):
     infile = str(infile)
     
     try:
-        d = yaml.safe_dump(json.load(open(infile)), default_flow_style)
+        d = yaml.safe_dump(json.load(open(infile)), default_flow_style=default_flow_style)
 
     except:
         raise RuntimeError('{0} not found'.format(infile))
         
     return d
+
+def yaml2pyini(infile, **kwargs):
+    """ Input - full path to config file
+    
+        Output - dictionary of file config parameters
+    """
+    infile = str(infile)
+    
+    try:
+        d = json.dumps(yaml.load(open(infile)), **kwargs)
+
+    except:
+        raise RuntimeError('{0} not found'.format(infile))
+        
+    return d
+
+def main():
+    import argparse
+
+    parser = argparse.ArgumentParser(description='Convert yaml to json or json to yaml')
+    parser.add_argument('config_file', metavar='config_file', type=str,
+               help='full path of file to be converted')
+               
+    args = parser.parse_args()
+
+    print args.config_file
+
+    if (args.config_file).split('.')[-1] in ['pyini','json']:
+        print pyini2yaml(args.config_file)
+    elif (args.config_file).split('.')[-1] == 'yaml':
+        print yaml2pyini(args.config_file, sort_keys=True, indent=4)
+    else:
+        print "only pyini and yaml endings are accepted"
+
+if __name__ == "__main__":
+    main()
