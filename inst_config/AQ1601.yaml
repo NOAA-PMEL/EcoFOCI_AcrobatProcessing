@@ -5,7 +5,7 @@ SBE_Temp_Coeffs:
   i: 2.49551995e-005
   j: 2.97852303e-006
   f0: 1000.0
-  Serial_Number: 0287
+  Serial_Number: Unknown
 
 SBE_Cond_Coeffs:
   g: -9.70711977
@@ -14,23 +14,26 @@ SBE_Cond_Coeffs:
   j: +1.82789061e-004
   CPcor: -9.5700e-008
   CTcor: +3.2500e-006
-  Serial_Number: 0287
+  Serial_Number: Unknown
 
 Wetlabs_CHL_Coeffs:
-  ScaleFactor: 0.0120
-  DarkCounts: 47
+  ScaleFactor: 0.0186
+  DarkCounts: 54
   Units: microgram/liter
-  Serial_Number: BB2FLVMT-739
+  Serial_Number: BBFL2WB-1307
+  CalDate: '2016-03-04'
 Wetlabs_700nm_Coeffs:
-  ScaleFactor: 3.313e-06
-  DarkCounts: 52
-  Units: m-1 sr-1
-  Serial_Number: BB2FLVMT-739
-Wetlabs_470nm_Coeffs:
-  ScaleFactor: 1.261e-05
-  DarkCounts: 47
-  Units: m-1 sr-1
-  Serial_Number: BB2FLVMT-739
+  ScaleFactor: 0.0516
+  DarkCounts: 50
+  Units: NTU
+  Serial_Number: BBFL2WB-1307
+  CalDate: '2016-03-04'
+Wetlabs_460nm_Coeffs:
+  ScaleFactor: 0.0864
+  DarkCounts: 48
+  Units: ppb
+  Serial_Number: BBFL2WB-1307
+  CalDate: '2016-03-04'
 
 Upward_PAR:
   Serial_Number: 

@@ -1,0 +1,53 @@
+---
+time:
+ long_name: ''
+ delta_t: "0000-00-00 00:00:01"
+ axis: "T"
+ standard_name: 'time'
+
+Latitude_GPS:
+ long_name: 'latitude'
+ units: 'degrees_north'
+ standard_name: 'latitude'
+
+Longitude_GPS: 
+ long_name: 'longitude'
+ units: 'degrees_west'
+ standard_name: 'longitude'
+
+Temperature_SBE49:
+ long_name: 'temperature in degrees celsius'
+ standard_name: 'sea_water_temperature'
+ units: 'degrees_celsius'
+ instrument: 'Seabird FastCat SBE49'
+ serial_number: ''
+
+Salinity_SBE49:
+ long_name: 'salinity in psu'
+ standard_name: 'sea_water_practical_salinity'
+ units: 'PSU'
+ instrument: 'Seabird FastCat SBE49'
+ serial_number: ''
+
+Pressure_SBE49:
+ long_name: 'pressure'
+ standard_name: 'sea_water_pressure'
+ units: 'dbar'
+ positive: 'down'
+ instrument: 'Seabird FastCat SBE49'
+ serial_number: ''
+ 
+
+Global_Attributes:
+ featureType: "TrajectoryProfile"
+ Conventions: 'CF-1.6'
+ title: 'AQ1601 Arctic ACROBAT Towed Vehicle Data'
+ CruiseID: 'AQ1601'
+ institution: 'NOAA/PMEL'
+ group: 'EcoFOCI'
+ comment: ''
+ source: 'acrobat observations merged from independent instrument records'
+ summary: ''
+ license: ''
+ time_coverage_start: ''
+ time_coverage_end: '' 
