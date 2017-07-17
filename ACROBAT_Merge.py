@@ -31,34 +31,38 @@ def var_att_update(ds,var,atts_dic):
 """-------------------------------- Main -----------------------------------------------"""
 
 
-GPS = pd.read_csv('/Volumes/WDC_internal/Users/bell/ecoraid/2016/AlongTrack/AQ1601/ACROBAT/working/Acrobat_GPS_clean_160912.csv')
+GPS = pd.read_csv('/Volumes/WDC_internal/Users/bell/ecoraid/2017/AlongTrack/DY1704/ACROBAT/working/DY1704_70M7_GPS_clean.csv')
 GPS.DateTime = pd.to_datetime(GPS.DateTime,format='%Y-%m-%dT%H:%M:%S')
 GPS = GPS.set_index(pd.DatetimeIndex(GPS['DateTime']))
 GPS.drop('DateTime', axis=1, inplace=True)
 
-FastCat = pd.read_csv('/Volumes/WDC_internal/Users/bell/ecoraid/2016/AlongTrack/AQ1601/ACROBAT/working/Acrobat_FastCat_clean_160912.csv')
+FastCat = pd.read_csv('/Volumes/WDC_internal/Users/bell/ecoraid/2017/AlongTrack/DY1704/ACROBAT/working/DY1704_70M7_FastCat_clean.csv')
 FastCat.DateTime = pd.to_datetime(FastCat.DateTime,format='%Y-%m-%dT%H:%M:%S')
 FastCat = FastCat.set_index(pd.DatetimeIndex(FastCat['DateTime']))
 FastCat.drop('DateTime', axis=1, inplace=True)
 
-Triplet = pd.read_csv('/Volumes/WDC_internal/Users/bell/ecoraid/2016/AlongTrack/AQ1601/ACROBAT/working/Acrobat_Triplet_clean_160912.csv')
+Triplet = pd.read_csv('/Volumes/WDC_internal/Users/bell/ecoraid/2017/AlongTrack/DY1704/ACROBAT/working/DY1704_70M7_Triplet_clean.csv')
 Triplet.DateTime = pd.to_datetime(Triplet.DateTime,format='%Y-%m-%dT%H:%M:%S')
 Triplet = Triplet.set_index(pd.DatetimeIndex(Triplet['DateTime']))
 Triplet.drop('DateTime', axis=1, inplace=True)
 
-ACROBAT = pd.read_csv('/Volumes/WDC_internal/Users/bell/ecoraid/2016/AlongTrack/AQ1601/ACROBAT/working/Acrobat_clean_160912.csv')
+ACROBAT = pd.read_csv('/Volumes/WDC_internal/Users/bell/ecoraid/2017/AlongTrack/DY1704/ACROBAT/working/DY1704_70M7_Acrobat_clean.csv')
 ACROBAT.DateTime = pd.to_datetime(ACROBAT.DateTime,format='%Y-%m-%dT%H:%M:%S')
 ACROBAT = ACROBAT.set_index(pd.DatetimeIndex(ACROBAT['DateTime']))
 ACROBAT.drop('DateTime', axis=1, inplace=True)
 
+Optode = pd.read_csv('/Volumes/WDC_internal/Users/bell/ecoraid/2017/AlongTrack/DY1704/ACROBAT/working/DY1704_70M7_Optode_clean.csv')
+Optode.DateTime = pd.to_datetime(Optode.DateTime,format='%Y-%m-%dT%H:%M:%S')
+Optode = Optode.set_index(pd.DatetimeIndex(Optode['DateTime']))
+Optode.drop('DateTime', axis=1, inplace=True)
 
-AllData=pd.concat([GPS, FastCat, Triplet, ACROBAT], axis=1)
+AllData=pd.concat([GPS, FastCat, Triplet, Optode, ACROBAT], axis=1)
 
 ### Apply Cals and Scaling Parameters
 AllData['Salinity'] = cond2salinity(AllData['Conductivity'],AllData['Temperature'],AllData['Pressure'])
 AllData = AllData.drop(['Conductivity'],1)
 
-cal_file_path = '/Volumes/WDC_internal/Users/bell/Programs/Python/EcoFOCI_AcrobatProcessing/inst_config/AQ1601.yaml'
+cal_file_path = '/Volumes/WDC_internal/Users/bell/Programs/Python/EcoFOCI_AcrobatProcessing/inst_config/DY1704.yaml'
 cal_file = ConfigParserLocal.get_config_yaml(cal_file_path)
 
 AllData['Wetlabs_CDOM'] = counts2engr(cal_file['Wetlabs_460nm_Coeffs'], AllData['460nm'])
@@ -81,15 +85,18 @@ AllData_x.rename({'DateTime':'time',
                   'Longitude':'Longitude_GPS',
                   'Temperature':'Temperature_SBE49',
                   'Salinity':'Salinity_SBE49',
-                  'Pressure':'Pressure_SBE49'}, inplace=True)
+                  'Pressure':'Pressure_SBE49',
+                  'O2Concentration[uM]':'OxyConc_Aanderra',
+                  'AirSaturation[%]':'OxySat_Aanderra'}, inplace=True)
 
 #drop acrobat details
 AllData_x = AllData_x.drop(['k1','k2','k3','lb','alt','ul','ll',
                             'roll','pitch','heading','temperature',
-                            'latdd','lathhmm','londd','lonhhmm','altitude'])
+                            'latdd','lathhmm','londd','lonhhmm','altitude',
+                            'Temperature[Deg.C]'])
 
 ### Update NetCDF attributes (global/variable)
-ncatts_file_path = '/Volumes/WDC_internal/Users/bell/Programs/Python/EcoFOCI_AcrobatProcessing/inst_config/AQ1601_nc_atts.yaml'
+ncatts_file_path = '/Volumes/WDC_internal/Users/bell/Programs/Python/EcoFOCI_AcrobatProcessing/inst_config/DY1704_nc_atts.yaml'
 netcdf_attrs = ConfigParserLocal.get_config_yaml(ncatts_file_path)
 
 for variable_name in AllData_x.keys():
@@ -104,11 +111,11 @@ for gatts in netcdf_attrs['Global_Attributes']:
 
 
 ### Save as NetCDF for all data and daily (as a function of time)
-date_r = pd.date_range('2016-09-01', freq='D', periods=31)
+date_r = pd.date_range('2017-04-24', freq='D', periods=6)
 for day in date_r:
     t =AllData_x.isel(time=AllData_x['time.day'] == day.day)
     if t.dims['time'] !=0:
-        t.to_netcdf('ACROBAT_AQ1601_'+str(day).split()[0]+'.nc',format='NETCDF4')
+        t.to_netcdf('ACROBAT_DY1704_'+str(day).split()[0]+'.nc',format='NETCDF4')
 
 
 #### Coordinate test

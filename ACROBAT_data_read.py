@@ -84,9 +84,15 @@ class Acrobat_GPS(object):
 
 			if '$GPRMC' in line:  # Get end of header.
 				line_parse = line.split(',')
-				nofrag, frag = line_parse[0].split('.')
-				dt_nofrag = datetime.datetime.strptime(nofrag,'%Y-%m-%dT%H:%M:%S')
-				dt_msec = dt_nofrag.replace(microsecond=int(frag))
+				try:
+					nofrag, frag = line_parse[0].split('.')
+					dt_nofrag = datetime.datetime.strptime(nofrag,'%Y-%m-%dT%H:%M:%S')
+					dt_msec = dt_nofrag.replace(microsecond=int(frag))
+				except:
+					nofrag = line_parse[0]
+					print nofrag
+					dt_nofrag = datetime.datetime.strptime(nofrag,'%Y-%m-%dT%H:%M:%S')
+
 				strlat = line_parse[4]
 				strlon = line_parse[6]
 
@@ -174,11 +180,52 @@ class Acrobat_ECOTriplet(object):
 		columns = ['DateTime','700nm','695nm','460nm']
 		columns_ind = [0,4,6,8]		
 
+		rawdata = pd.read_csv(fobj, names=columns, usecols=columns_ind,sep='\s+|,',engine='python', error_bad_lines=False)       
+		rawdata.DateTime = pd.to_datetime(rawdata.DateTime,format='%Y-%m-%dT%H:%M:%S')
+		rawdata['700nm'] = pd.to_numeric(rawdata['700nm'],errors='coerce',downcast='integer')
+		rawdata['695nm'] = pd.to_numeric(rawdata['695nm'],errors='coerce',downcast='integer')
+		rawdata['460nm'] = pd.to_numeric(rawdata['460nm'],errors='coerce',downcast='integer')
+		rawdata = rawdata.set_index(pd.DatetimeIndex(rawdata['DateTime']))
+		print rawdata.resample('1s',label='right',closed='right').mean().interpolate().to_csv()
+
+	@staticmethod	
+	def parse_second(fobj, **kwargs):
+		r"""
+		Method to parse gps data from ACROBAT after first pass
+		"""
+		rawdata = pd.read_csv(fobj)       
+		rawdata.DateTime = pd.to_datetime(rawdata.DateTime,format='%Y-%m-%d %H:%M:%S')
+		rawdata = rawdata.set_index(pd.DatetimeIndex(rawdata['DateTime']))
+		print rawdata.resample('1s',label='right',closed='right').mean().to_csv()
+
+class Acrobat_AanOptode(object):
+
+	@staticmethod
+	def get_data(filename=None, **kwargs):
+		r"""
+		Basic Method to open files.  Specific actions can be passes as kwargs for instruments
+		"""
+
+		fobj = open(filename)
+		data = fobj.read()
+
+
+		buf = data
+		return BytesIO(buf.strip())
+
+	@staticmethod	
+	def parse(fobj, **kwargs):
+		r"""
+		Method to parse Aandera Optode data from ACROBAT
+		"""
+		columns = ['DateTime','O2Concentration[uM]','AirSaturation[%]','Temperature[Deg.C]']
+		columns_ind = [0,5,7,9]		
+
 		rawdata = pd.read_csv(fobj, names=columns, usecols=columns_ind,sep='\s+|,',engine='python')       
 		rawdata.DateTime = pd.to_datetime(rawdata.DateTime,format='%Y-%m-%dT%H:%M:%S')
-		rawdata['700nm'] = pd.to_numeric(rawdata['460nm'],errors='coerce',downcast='integer')
-		rawdata['695nm'] = pd.to_numeric(rawdata['460nm'],errors='coerce',downcast='integer')
-		rawdata['460nm'] = pd.to_numeric(rawdata['460nm'],errors='coerce',downcast='integer')
+		rawdata['O2Concentration[uM]'] = pd.to_numeric(rawdata['O2Concentration[uM]'],errors='coerce',downcast='integer')
+		rawdata['AirSaturation[%]'] = pd.to_numeric(rawdata['AirSaturation[%]'],errors='coerce',downcast='integer')
+		rawdata['Temperature[Deg.C]'] = pd.to_numeric(rawdata['Temperature[Deg.C]'],errors='coerce',downcast='integer')
 		rawdata = rawdata.set_index(pd.DatetimeIndex(rawdata['DateTime']))
 		print rawdata.resample('1s',label='right',closed='right').mean().interpolate().to_csv()
 
@@ -217,7 +264,7 @@ class Acrobat_System(object):
 			'S:004','vn','ve','wc','vd','lb','wa','alt','sv','md','ul','ll','k1','k2','k3',
 			'roll','pitch','heading','temperature','altitude','gps time']
 
-		rawdata = pd.read_csv(fobj, names=columns,skiprows=18)       
+		rawdata = pd.read_csv(fobj, names=columns,skiprows=18, error_bad_lines=False)       
 		rawdata['DateTime'] = pd.to_datetime((rawdata.yyyy).apply(str)+' '+(rawdata.ddd).apply(str)+' '+rawdata['hh:mm:ss'],format='%Y %j %H:%M:%S')
 		
 		if kwargs['UTC_offset_corr']:
@@ -242,7 +289,7 @@ parser = argparse.ArgumentParser(description='CTD plots')
 parser.add_argument('DataPath', metavar='DataPath', type=str,
 	help='full path to directory of processed nc files')
 parser.add_argument('Instrument', metavar='Instrument', type=str,
-	help='choose: ACROBAT, GPS, FastCAT, SUNA, ECOTriplet')
+	help='choose: ACROBAT, GPS, FastCAT, SUNA, ECOTriplet, AanOptode')
 parser.add_argument('-sp','--second_pass', action="store_true",
     help='second round of parsing if chosen')
 
@@ -257,6 +304,8 @@ if not args.second_pass:
 		get_inst_data(args.DataPath, source=Acrobat_ECOTriplet)
 	elif args.Instrument in ['ACROBAT','acrobat']:
 		get_inst_data(args.DataPath, source=Acrobat_System, UTC_offset_corr=7)
+	elif args.Instrument in ['AanOptode','optode']:
+		get_inst_data(args.DataPath, source=Acrobat_AanOptode)
 	else:
 		print "Instrument not identified.  See commandline help for options"
 else:
@@ -268,5 +317,7 @@ else:
 		get_inst_data(args.DataPath, source=Acrobat_ECOTriplet, passnumber='second')
 	elif args.Instrument in ['ACROBAT','acrobat']:
 		get_inst_data(args.DataPath, source=Acrobat_System, passnumber='second')	
+	elif args.Instrument in ['AanOptode','optode']:
+		get_inst_data(args.DataPath, source=Acrobat_AanOptode, passnumber='second')
 	else:
 		print "Instrument not identified.  See commandline help for options"	

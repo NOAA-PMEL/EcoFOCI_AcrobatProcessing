@@ -36,14 +36,29 @@ Pressure_SBE49:
  positive: 'down'
  instrument: 'Seabird FastCat SBE49'
  serial_number: ''
- 
+
+OxyConc_Aanderra: 
+ long_name: 'dissolved oxygen concentration'
+ standard_name: 'sea_water_pressure'
+ units: 'dbar'
+ positive: 'down'
+ instrument: 'Aanderaa 4831F'
+ serial_number: ''
+
+OxySat_Aanderra: 
+ long_name: 'dissolved oxygen percent saturation'
+ standard_name: 'Aanderaa 4831F'
+ units: 'dbar'
+ positive: 'down'
+ instrument: 'Aanderaa 4831F'
+ serial_number: ''
 
 Global_Attributes:
  featureType: "TrajectoryProfile"
  Conventions: 'CF-1.6'
- title: 'AQ1601 Arctic ACROBAT Towed Vehicle Data'
- sea_name: 'Chukchi Sea'
- CruiseID: 'AQ1601'
+ title: 'DY1704 Bering Sea ACROBAT Towed Vehicle Data'
+ sea_name: 'Bering Sea'
+ CruiseID: 'DY1704'
  institution: 'NOAA/PMEL'
  group: 'EcoFOCI'
  comment: ''
