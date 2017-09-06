@@ -41,3 +41,10 @@ Downward_PAR:
   Serial_Number: 
 OxygenSensor:
   Serial_Number: 602
+
+db_table: 
+  gps: aq1601_gps
+  ctd: aq1601_ctd
+  suna: aq1601_suna
+  triplet: aq1601_triplet
+  oxy: aq1601_oxy
