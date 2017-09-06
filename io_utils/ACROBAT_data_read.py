@@ -18,9 +18,15 @@
 import datetime
 import numpy as np
 import pandas as pd
-import argparse
+import mysql.connector
 from io import BytesIO
 
+def available_data_sources():
+	r"""List of acronyms and options for names for instruments"""
+	sources = {
+			   'gps':Acrobat_GPS,'ctd':Acrobat_FastCAT,'triplet':Acrobat_ECOTriplet
+			   }
+	return sources
 
 def get_inst_data(filename, passnumber='first', **kwargs):
 	r"""
@@ -46,13 +52,15 @@ def get_inst_data(filename, passnumber='first', **kwargs):
 
 	"""
 	if passnumber == 'first':
-		src = kwargs['source']
+		src = available_data_sources().get(kwargs['source'])
 		fobj = src.get_data(filename)
 		Dataset = src.parse(fobj, **kwargs)
+		return Dataset
 	elif passnumber == 'second':
-		src = kwargs['source']
+		src = available_data_sources().get(kwargs['source'])
 		fobj = src.get_data(filename)
 		Dataset = src.parse_second(fobj, **kwargs)
+		return Dataset
 	else:
 		raise RuntimeError('Invalid passnumber')
 
@@ -103,7 +111,7 @@ class Acrobat_GPS(object):
 										ignore_index=True)
 
 		rawdata = rawdata.set_index(pd.DatetimeIndex(rawdata['DateTime']))
-		print rawdata.resample('1s',label='right',closed='right').mean().interpolate().to_csv()
+		return rawdata
 
 	@staticmethod	
 	def parse_second(fobj, **kwargs):
@@ -113,7 +121,7 @@ class Acrobat_GPS(object):
 		rawdata = pd.read_csv(fobj)       
 		rawdata.DateTime = pd.to_datetime(rawdata.DateTime,format='%Y-%m-%d %H:%M:%S')
 		rawdata = rawdata.set_index(pd.DatetimeIndex(rawdata['DateTime']))
-		print rawdata.resample('1s',label='right',closed='right').mean().to_csv()
+		return rawdata
 
 class Acrobat_FastCAT(object):
 
@@ -142,7 +150,7 @@ class Acrobat_FastCAT(object):
 		rawdata['Conductivity'] = pd.to_numeric(rawdata['Conductivity'],errors='coerce',downcast='float')
 		rawdata['Pressure'] = pd.to_numeric(rawdata['Pressure'],errors='coerce',downcast='float')
 		rawdata = rawdata.set_index(pd.DatetimeIndex(rawdata['DateTime']))
-		print rawdata.resample('1s',label='right',closed='right').mean().interpolate().to_csv()
+		return rawdata
 
 	@staticmethod	
 	def parse_second(fobj, **kwargs):
@@ -152,7 +160,7 @@ class Acrobat_FastCAT(object):
 		rawdata = pd.read_csv(fobj)       
 		rawdata.DateTime = pd.to_datetime(rawdata.DateTime,format='%Y-%m-%d %H:%M:%S')
 		rawdata = rawdata.set_index(pd.DatetimeIndex(rawdata['DateTime']))
-		print rawdata.resample('1s',label='right',closed='right').mean().to_csv()
+		return rawdata
 
 class Acrobat_ECOTriplet(object):
 
@@ -186,7 +194,7 @@ class Acrobat_ECOTriplet(object):
 		rawdata['695nm'] = pd.to_numeric(rawdata['695nm'],errors='coerce',downcast='integer')
 		rawdata['460nm'] = pd.to_numeric(rawdata['460nm'],errors='coerce',downcast='integer')
 		rawdata = rawdata.set_index(pd.DatetimeIndex(rawdata['DateTime']))
-		print rawdata.resample('1s',label='right',closed='right').mean().interpolate().to_csv()
+		return rawdata
 
 	@staticmethod	
 	def parse_second(fobj, **kwargs):
@@ -196,7 +204,7 @@ class Acrobat_ECOTriplet(object):
 		rawdata = pd.read_csv(fobj)       
 		rawdata.DateTime = pd.to_datetime(rawdata.DateTime,format='%Y-%m-%d %H:%M:%S')
 		rawdata = rawdata.set_index(pd.DatetimeIndex(rawdata['DateTime']))
-		print rawdata.resample('1s',label='right',closed='right').mean().to_csv()
+		return rawdata
 
 class Acrobat_AanOptode(object):
 
@@ -227,7 +235,7 @@ class Acrobat_AanOptode(object):
 		rawdata['AirSaturation[%]'] = pd.to_numeric(rawdata['AirSaturation[%]'],errors='coerce',downcast='integer')
 		rawdata['Temperature[Deg.C]'] = pd.to_numeric(rawdata['Temperature[Deg.C]'],errors='coerce',downcast='integer')
 		rawdata = rawdata.set_index(pd.DatetimeIndex(rawdata['DateTime']))
-		print rawdata.resample('1s',label='right',closed='right').mean().interpolate().to_csv()
+		return rawdata
 
 	@staticmethod	
 	def parse_second(fobj, **kwargs):
@@ -237,7 +245,7 @@ class Acrobat_AanOptode(object):
 		rawdata = pd.read_csv(fobj)       
 		rawdata.DateTime = pd.to_datetime(rawdata.DateTime,format='%Y-%m-%d %H:%M:%S')
 		rawdata = rawdata.set_index(pd.DatetimeIndex(rawdata['DateTime']))
-		print rawdata.resample('1s',label='right',closed='right').mean().to_csv()
+		return rawdata
 
 class Acrobat_System(object):
 
@@ -272,7 +280,7 @@ class Acrobat_System(object):
 			rawdata['DateTime'] = rawdata['DateTime']+pd.Timedelta(toff)
 		rawdata = rawdata.set_index(pd.DatetimeIndex(rawdata['DateTime']))
 		rawdata.drop(['yyyy','ddd','gps time'], axis=1, inplace=True)
-		print rawdata.resample('1s',label='right',closed='right').mean().to_csv()
+		return rawdata
 
 	@staticmethod	
 	def parse_second(fobj, **kwargs):
@@ -282,42 +290,5 @@ class Acrobat_System(object):
 		rawdata = pd.read_csv(fobj)       
 		rawdata.DateTime = pd.to_datetime(rawdata.DateTime,format='%Y-%m-%d %H:%M:%S')
 		rawdata = rawdata.set_index(pd.DatetimeIndex(rawdata['DateTime']))
-		print rawdata.resample('1s',label='right',closed='right').mean().to_csv()
+		return rawdata
 
-"""--------------------------------------------------------------------------------------"""
-parser = argparse.ArgumentParser(description='CTD plots')
-parser.add_argument('DataPath', metavar='DataPath', type=str,
-	help='full path to directory of processed nc files')
-parser.add_argument('Instrument', metavar='Instrument', type=str,
-	help='choose: ACROBAT, GPS, FastCAT, SUNA, ECOTriplet, AanOptode')
-parser.add_argument('-sp','--second_pass', action="store_true",
-    help='second round of parsing if chosen')
-
-args = parser.parse_args()
-
-if not args.second_pass:
-	if args.Instrument in ['GPS','gps']:
-		get_inst_data(args.DataPath, source=Acrobat_GPS)
-	elif args.Instrument in ['fastcat','FastCAT']:
-		get_inst_data(args.DataPath, source=Acrobat_FastCAT)
-	elif args.Instrument in ['ECOTriplet']:
-		get_inst_data(args.DataPath, source=Acrobat_ECOTriplet)
-	elif args.Instrument in ['ACROBAT','acrobat']:
-		get_inst_data(args.DataPath, source=Acrobat_System, UTC_offset_corr=7)
-	elif args.Instrument in ['AanOptode','optode']:
-		get_inst_data(args.DataPath, source=Acrobat_AanOptode)
-	else:
-		print "Instrument not identified.  See commandline help for options"
-else:
-	if args.Instrument in ['GPS','gps']:
-		get_inst_data(args.DataPath, source=Acrobat_GPS, passnumber='second')
-	elif args.Instrument in ['fastcat','FastCAT']:
-		get_inst_data(args.DataPath, source=Acrobat_FastCAT, passnumber='second')
-	elif args.Instrument in ['ECOTriplet']:
-		get_inst_data(args.DataPath, source=Acrobat_ECOTriplet, passnumber='second')
-	elif args.Instrument in ['ACROBAT','acrobat']:
-		get_inst_data(args.DataPath, source=Acrobat_System, passnumber='second')	
-	elif args.Instrument in ['AanOptode','optode']:
-		get_inst_data(args.DataPath, source=Acrobat_AanOptode, passnumber='second')
-	else:
-		print "Instrument not identified.  See commandline help for options"	

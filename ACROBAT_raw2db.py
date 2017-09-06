@@ -65,8 +65,15 @@ elif args.Instrument in ['fastcat','FastCAT','sbe49']:
 																				  conductivity=row['Conductivity'],
 																				  pressure=row['Pressure'])
 elif args.Instrument in ['ECOTriplet','triplet','wetlabs']:
-	rawdata = ACROBAT_data_read.get_inst_data(args.DataPath, source=Acrobat_ECOTriplet)
 	instid = 'triplet'
+	rawdata = ACROBAT_data_read.get_inst_data(args.DataPath, source=instid)
+	rawdata = rawdata.where((pd.notnull(rawdata)), None)
+	for index, row in rawdata.iterrows():
+		EcoFOCI_db.add_to_DB(table=state_config['db_table'][instid],verbose=False,pctime=row['DateTime'],
+																				  sig700nm=row['700nm'],
+																				  sig695nm=row['695nm'],
+																				  sig460nm=row['460nm'])
+
 elif args.Instrument in ['ACROBAT','acrobat']:
 	rawdata = ACROBAT_data_read.get_inst_data(args.DataPath, source=Acrobat_System, UTC_offset_corr=7)
 	instid = 'acrobat'

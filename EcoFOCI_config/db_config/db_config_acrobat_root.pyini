@@ -1,7 +1,7 @@
 {
-    "database": "pmel_oculus", 
+    "database": "acrobat", 
     "host": "localhost", 
     "password": "e43mqS4fusEaGJLE", 
     "user": "pythonuser",
-    "port": 3306
+    "port": 8889
 }
