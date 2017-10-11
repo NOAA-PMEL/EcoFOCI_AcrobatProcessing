@@ -55,7 +55,7 @@ class NumpyMySQLConverter(mysql.connector.conversion.MySQLConverter):
 class EcoFOCI_db_acrobat(object):
     """Class definitions to access EcoFOCI Mooring Database"""
 
-    def connect_to_DB(self, db_config_file=None):
+    def connect_to_DB(self, db_config_file=None, ftype='yaml'):
         """Try to establish database connection
 
         Parameters
@@ -64,7 +64,7 @@ class EcoFOCI_db_acrobat(object):
             full path to json formatted database config file    
 
         """
-        db_config = ConfigParserLocal.get_config(db_config_file)
+        db_config = ConfigParserLocal.get_config(db_config_file,ftype)
         try:
             self.db = mysql.connector.connect(**db_config)
         except mysql.connector.Error as err:
