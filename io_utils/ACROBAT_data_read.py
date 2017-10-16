@@ -12,6 +12,7 @@
  
  History:
  --------
+ 2017-10-16 - S.BELL: update nmea parsing
  2017-03-16 - S.BELL: Add second pass option to files
 
 """
@@ -19,7 +20,10 @@ import datetime
 import numpy as np
 import pandas as pd
 import mysql.connector
+
 from io import BytesIO
+
+import pynmea2
 
 def available_data_sources():
 	r"""List of acronyms and options for names for instruments"""
@@ -80,35 +84,49 @@ class Acrobat_GPS(object):
 		return BytesIO(buf.strip())
 
 	@staticmethod	
-	def parse(fobj, **kwargs):
+	def parse(fobj, pynmea2=True, **kwargs):
 		r"""
 		Method to parse gps data from ACROBAT
 		"""
 
-		rawdata = pd.DataFrame(columns=['DateTime','Latitude','Longitude'])
+		rawdata = pd.DataFrame(columns=['DateTime','Latitude','Longitude','SOG'])
 		for k, line in enumerate(fobj.readlines()):
 
 			line = line.strip()
 
-			if '$GPRMC' in line:  # Get end of header.
-				line_parse = line.split(',')
-				try:
-					nofrag, frag = line_parse[0].split('.')
-					dt_nofrag = datetime.datetime.strptime(nofrag,'%Y-%m-%dT%H:%M:%S')
-					dt_msec = dt_nofrag.replace(microsecond=int(frag))
-				except:
-					nofrag = line_parse[0]
-					print nofrag
-					dt_nofrag = datetime.datetime.strptime(nofrag,'%Y-%m-%dT%H:%M:%S')
+			if pynmea2:
+				if '$GPRMC' in line:  # Get end of header.
+					line_parse = line.split(',')
+					data=pynmea2.parse(",".join(line_parse[1:]))
 
-				strlat = line_parse[4]
-				strlon = line_parse[6]
+					rawdata =rawdata.append(pd.DataFrame([[data.datatime,
+											data.latitude,
+											data.longitude,
+											data.spd_over_grnd]],
+											columns=['DateTime','Latitude','Longitude','SOG']),
+											ignore_index=True)
+			else:
+				if '$GPRMC' in line:  # Get end of header.
+					line_parse = line.split(',')
+					data=pynmea2.parse(",".join(line_parse[1:]))
+					try:
+						nofrag, frag = line_parse[0].split('.')
+						dt_nofrag = datetime.datetime.strptime(nofrag,'%Y-%m-%dT%H:%M:%S')
+						dt_msec = dt_nofrag.replace(microsecond=int(frag))
+					except:
+						nofrag = line_parse[0]
+						print nofrag
+						dt_nofrag = datetime.datetime.strptime(nofrag,'%Y-%m-%dT%H:%M:%S')
 
-				rawdata =rawdata.append(pd.DataFrame([[dt_msec,
-										float(strlat[0:2]) + float(strlat[2:])/60,
-										float(strlon[0:3]) + float(strlon[3:])/60]],
-										columns=['DateTime','Latitude','Longitude']),
-										ignore_index=True)
+					strlat = line_parse[4]
+					strlon = line_parse[6]
+
+					rawdata =rawdata.append(pd.DataFrame([[dt_msec,
+											float(strlat[0:2]) + float(strlat[2:])/60,
+											float(strlon[0:3]) + float(strlon[3:])/60],
+											float(line_parse[8])],
+											columns=['DateTime','Latitude','Longitude','SOG']),
+											ignore_index=True)
 
 		rawdata = rawdata.set_index(pd.DatetimeIndex(rawdata['DateTime']))
 		return rawdata
