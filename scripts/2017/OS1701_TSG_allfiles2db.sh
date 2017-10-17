@@ -3,7 +3,7 @@
 # Purpose:
 #       Script to run ACROBAT_gps_read.py
 
-data_dir="/Volumes/WDC_internal/Users/bell/ecoraid/2017/AlongTrack/os1701/TSG//RAW/GPS/*Ocean_Starr*.dat"
+data_dir="/Volumes/WDC_internal/Users/bell/ecoraid/2017/AlongTrack/os1701/TSG//RAW/TSG/*Ocean_Starr*.dat"
 prog_dir="/Volumes/WDC_internal/Users/bell/Programs/Python/EcoFOCI_AcrobatProcessing/"
 
 
@@ -12,5 +12,5 @@ do
     names=(${files//\// })
     outfile=${names[${#names[@]} - 1]}
     #echo "processing file: $files"
-    python ${prog_dir}ACROBAT_raw2csv.py ${files} GPS -avestring 60s
+    python ${prog_dir}ACROBAT_raw2db.py ${files} TSG -ini EcoFOCI_config/OS1701.yaml
 done

@@ -28,7 +28,8 @@ import pynmea2
 def available_data_sources():
 	r"""List of acronyms and options for names for instruments"""
 	sources = {
-			   'gps':Acrobat_GPS,'ctd':Acrobat_FastCAT,'triplet':Acrobat_ECOTriplet
+			   'gps':Acrobat_GPS,'ctd':Acrobat_FastCAT,'triplet':Acrobat_ECOTriplet,
+			   'tsg':Acrobat_TSG,'eco':Acrobat_ECO
 			   }
 	return sources
 
@@ -84,7 +85,7 @@ class Acrobat_GPS(object):
 		return BytesIO(buf.strip())
 
 	@staticmethod	
-	def parse(fobj, pynmea2=True, **kwargs):
+	def parse(fobj, use_pynmea2=True, **kwargs):
 		r"""
 		Method to parse gps data from ACROBAT
 		"""
@@ -94,21 +95,33 @@ class Acrobat_GPS(object):
 
 			line = line.strip()
 
-			if pynmea2:
+			if use_pynmea2:
+				#only good to the second... uses most recent gps data and ignores
+				#all other data if frequency is > 1hz
 				if '$GPRMC' in line:  # Get end of header.
 					line_parse = line.split(',')
+
+					try:
+						nofrag, frag = line_parse[0].split('.')
+						dt_nofrag = datetime.datetime.strptime(nofrag,'%Y-%m-%dT%H:%M:%S')
+						dt_msec = dt_nofrag.replace(microsecond=int(frag))
+					except:
+						nofrag = line_parse[0]
+						print nofrag
+						dt_nofrag = datetime.datetime.strptime(nofrag,'%Y-%m-%dT%H:%M:%S')
+
 					data=pynmea2.parse(",".join(line_parse[1:]))
 
-					rawdata =rawdata.append(pd.DataFrame([[data.datatime,
+					rawdata =rawdata.append(pd.DataFrame([[dt_msec,
+											data.datetime,
 											data.latitude,
 											data.longitude,
 											data.spd_over_grnd]],
-											columns=['DateTime','Latitude','Longitude','SOG']),
+											columns=['PCTime','DateTime','Latitude','Longitude','SOG']),
 											ignore_index=True)
 			else:
 				if '$GPRMC' in line:  # Get end of header.
 					line_parse = line.split(',')
-					data=pynmea2.parse(",".join(line_parse[1:]))
 					try:
 						nofrag, frag = line_parse[0].split('.')
 						dt_nofrag = datetime.datetime.strptime(nofrag,'%Y-%m-%dT%H:%M:%S')
@@ -180,6 +193,45 @@ class Acrobat_FastCAT(object):
 		rawdata = rawdata.set_index(pd.DatetimeIndex(rawdata['DateTime']))
 		return rawdata
 
+class Acrobat_TSG(object):
+
+	@staticmethod
+	def get_data(filename=None, **kwargs):
+		r"""
+		Basic Method to open files.  Specific actions can be passes as kwargs for instruments
+		"""
+
+		fobj = open(filename)
+		data = fobj.read()
+
+
+		buf = data
+		return BytesIO(buf.strip())
+
+	@staticmethod	
+	def parse(fobj, sal_output=False, press_output=False, **kwargs):
+		r"""
+		Method to parse FastCat data from ACROBAT
+		"""
+
+		rawdata = pd.read_csv(fobj, names=['DateTime','Temperature','Conductivity','Salinity'])       
+		rawdata.DateTime = pd.to_datetime(rawdata.DateTime,format='%Y-%m-%dT%H:%M:%S')
+		rawdata['Temperature'] = pd.to_numeric(rawdata['Temperature'],errors='coerce',downcast='float')
+		rawdata['Conductivity'] = pd.to_numeric(rawdata['Conductivity'],errors='coerce',downcast='float')
+		rawdata['Salinity'] = pd.to_numeric(rawdata['Salinity'],errors='coerce',downcast='float')
+		rawdata = rawdata.set_index(pd.DatetimeIndex(rawdata['DateTime']))
+		return rawdata
+
+	@staticmethod	
+	def parse_second(fobj, **kwargs):
+		r"""
+		Method to parse gps data from ACROBAT after first pass
+		"""
+		rawdata = pd.read_csv(fobj)       
+		rawdata.DateTime = pd.to_datetime(rawdata.DateTime,format='%Y-%m-%d %H:%M:%S')
+		rawdata = rawdata.set_index(pd.DatetimeIndex(rawdata['DateTime']))
+		return rawdata
+
 class Acrobat_ECOTriplet(object):
 
 	@staticmethod
@@ -211,6 +263,48 @@ class Acrobat_ECOTriplet(object):
 		rawdata['700nm'] = pd.to_numeric(rawdata['700nm'],errors='coerce',downcast='integer')
 		rawdata['695nm'] = pd.to_numeric(rawdata['695nm'],errors='coerce',downcast='integer')
 		rawdata['460nm'] = pd.to_numeric(rawdata['460nm'],errors='coerce',downcast='integer')
+		rawdata = rawdata.set_index(pd.DatetimeIndex(rawdata['DateTime']))
+		return rawdata
+
+	@staticmethod	
+	def parse_second(fobj, **kwargs):
+		r"""
+		Method to parse gps data from ACROBAT after first pass
+		"""
+		rawdata = pd.read_csv(fobj)       
+		rawdata.DateTime = pd.to_datetime(rawdata.DateTime,format='%Y-%m-%d %H:%M:%S')
+		rawdata = rawdata.set_index(pd.DatetimeIndex(rawdata['DateTime']))
+		return rawdata
+
+class Acrobat_ECO(object):
+
+	@staticmethod
+	def get_data(filename=None, **kwargs):
+		r"""
+		Basic Method to open files.  Specific actions can be passes as kwargs for instruments
+		"""
+
+		fobj = open(filename)
+		data = fobj.read()
+
+
+		buf = data
+		return BytesIO(buf.strip())
+
+	@staticmethod	
+	def parse(fobj, **kwargs):
+		r"""
+		Method to parse FastCat data from ACROBAT
+		"""
+		#columns = ['DateTime','EcoDate','EcoTime','700nm','695nm','460nm']
+		#columns_ind = [0,1,2,4,6,8]
+		##use following if gps feed exists... rely on gps for time syncing
+		columns = ['DateTime','695']
+		columns_ind = [0,4]		
+
+		rawdata = pd.read_csv(fobj, names=columns, usecols=columns_ind,sep='\s+|,',engine='python', error_bad_lines=False)       
+		rawdata.DateTime = pd.to_datetime(rawdata.DateTime,format='%Y-%m-%dT%H:%M:%S')
+		rawdata['695nm'] = pd.to_numeric(rawdata['695nm'],errors='coerce',downcast='integer')
 		rawdata = rawdata.set_index(pd.DatetimeIndex(rawdata['DateTime']))
 		return rawdata
 

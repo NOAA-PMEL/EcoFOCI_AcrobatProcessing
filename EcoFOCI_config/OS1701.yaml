@@ -1,0 +1,31 @@
+--- 
+SBE_Temp_Coeffs:
+  g: 
+  h: 
+  i: 
+  j: 
+  f0: 1000.0
+  Serial_Number: Unknown
+
+SBE_Cond_Coeffs:
+  g: 
+  h: 
+  i: 
+  j: 
+  CPcor: 
+  CTcor: 
+  Serial_Number: Unknown
+
+Wetlabs_CHL_Coeffs:
+  ScaleFactor: 0.0079
+  DarkCounts: 104
+  Units: microgram/liter
+  Serial_Number: FLS-027
+  CalDate: '2006-01-19'
+
+db_table:
+  merged: os1701 
+  gps: os1701_gps
+  tsg: os1701_TSG
+  isus: os1701_isus
+  eco: os1701_eco
