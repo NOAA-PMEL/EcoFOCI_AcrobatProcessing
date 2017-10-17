@@ -107,7 +107,6 @@ class Acrobat_GPS(object):
 						dt_msec = dt_nofrag.replace(microsecond=int(frag))
 					except:
 						nofrag = line_parse[0]
-						print nofrag
 						dt_nofrag = datetime.datetime.strptime(nofrag,'%Y-%m-%dT%H:%M:%S')
 
 					data=pynmea2.parse(",".join(line_parse[1:]))
@@ -128,7 +127,6 @@ class Acrobat_GPS(object):
 						dt_msec = dt_nofrag.replace(microsecond=int(frag))
 					except:
 						nofrag = line_parse[0]
-						print nofrag
 						dt_nofrag = datetime.datetime.strptime(nofrag,'%Y-%m-%dT%H:%M:%S')
 
 					strlat = line_parse[4]
@@ -142,16 +140,10 @@ class Acrobat_GPS(object):
 											ignore_index=True)
 
 		rawdata = rawdata.set_index(pd.DatetimeIndex(rawdata['DateTime']))
-		return rawdata
 
-	@staticmethod	
-	def parse_second(fobj, **kwargs):
-		r"""
-		Method to parse gps data from ACROBAT after first pass
-		"""
-		rawdata = pd.read_csv(fobj)       
-		rawdata.DateTime = pd.to_datetime(rawdata.DateTime,format='%Y-%m-%d %H:%M:%S')
-		rawdata = rawdata.set_index(pd.DatetimeIndex(rawdata['DateTime']))
+		if kwargs['time_correction_seconds']:
+			rawdata['DateTime'] = rawdata['DateTime']+pd.Timedelta(seconds=kwargs['time_correction_seconds'])
+
 		return rawdata
 
 class Acrobat_FastCAT(object):
@@ -181,16 +173,10 @@ class Acrobat_FastCAT(object):
 		rawdata['Conductivity'] = pd.to_numeric(rawdata['Conductivity'],errors='coerce',downcast='float')
 		rawdata['Pressure'] = pd.to_numeric(rawdata['Pressure'],errors='coerce',downcast='float')
 		rawdata = rawdata.set_index(pd.DatetimeIndex(rawdata['DateTime']))
-		return rawdata
 
-	@staticmethod	
-	def parse_second(fobj, **kwargs):
-		r"""
-		Method to parse gps data from ACROBAT after first pass
-		"""
-		rawdata = pd.read_csv(fobj)       
-		rawdata.DateTime = pd.to_datetime(rawdata.DateTime,format='%Y-%m-%d %H:%M:%S')
-		rawdata = rawdata.set_index(pd.DatetimeIndex(rawdata['DateTime']))
+		if kwargs['time_correction_seconds']:
+			rawdata['DateTime'] = rawdata['DateTime']+pd.Timedelta(seconds=kwargs['time_correction_seconds'])
+
 		return rawdata
 
 class Acrobat_TSG(object):
@@ -220,16 +206,10 @@ class Acrobat_TSG(object):
 		rawdata['Conductivity'] = pd.to_numeric(rawdata['Conductivity'],errors='coerce',downcast='float')
 		rawdata['Salinity'] = pd.to_numeric(rawdata['Salinity'],errors='coerce',downcast='float')
 		rawdata = rawdata.set_index(pd.DatetimeIndex(rawdata['DateTime']))
-		return rawdata
 
-	@staticmethod	
-	def parse_second(fobj, **kwargs):
-		r"""
-		Method to parse gps data from ACROBAT after first pass
-		"""
-		rawdata = pd.read_csv(fobj)       
-		rawdata.DateTime = pd.to_datetime(rawdata.DateTime,format='%Y-%m-%d %H:%M:%S')
-		rawdata = rawdata.set_index(pd.DatetimeIndex(rawdata['DateTime']))
+		if kwargs['time_correction_seconds']:
+			rawdata['DateTime'] = rawdata['DateTime']+pd.Timedelta(seconds=kwargs['time_correction_seconds'])
+
 		return rawdata
 
 class Acrobat_ECOTriplet(object):
@@ -264,17 +244,12 @@ class Acrobat_ECOTriplet(object):
 		rawdata['695nm'] = pd.to_numeric(rawdata['695nm'],errors='coerce',downcast='integer')
 		rawdata['460nm'] = pd.to_numeric(rawdata['460nm'],errors='coerce',downcast='integer')
 		rawdata = rawdata.set_index(pd.DatetimeIndex(rawdata['DateTime']))
+
+		if kwargs['time_correction_seconds']:
+			rawdata['DateTime'] = rawdata['DateTime']+pd.Timedelta(seconds=kwargs['time_correction_seconds'])
+
 		return rawdata
 
-	@staticmethod	
-	def parse_second(fobj, **kwargs):
-		r"""
-		Method to parse gps data from ACROBAT after first pass
-		"""
-		rawdata = pd.read_csv(fobj)       
-		rawdata.DateTime = pd.to_datetime(rawdata.DateTime,format='%Y-%m-%d %H:%M:%S')
-		rawdata = rawdata.set_index(pd.DatetimeIndex(rawdata['DateTime']))
-		return rawdata
 
 class Acrobat_ECO(object):
 
@@ -306,16 +281,10 @@ class Acrobat_ECO(object):
 		rawdata.DateTime = pd.to_datetime(rawdata.DateTime,format='%Y-%m-%dT%H:%M:%S')
 		rawdata['695nm'] = pd.to_numeric(rawdata['695nm'],errors='coerce',downcast='integer')
 		rawdata = rawdata.set_index(pd.DatetimeIndex(rawdata['DateTime']))
-		return rawdata
 
-	@staticmethod	
-	def parse_second(fobj, **kwargs):
-		r"""
-		Method to parse gps data from ACROBAT after first pass
-		"""
-		rawdata = pd.read_csv(fobj)       
-		rawdata.DateTime = pd.to_datetime(rawdata.DateTime,format='%Y-%m-%d %H:%M:%S')
-		rawdata = rawdata.set_index(pd.DatetimeIndex(rawdata['DateTime']))
+		if kwargs['time_correction_seconds']:
+			rawdata['DateTime'] = rawdata['DateTime']+pd.Timedelta(seconds=kwargs['time_correction_seconds'])
+
 		return rawdata
 
 class Acrobat_AanOptode(object):
@@ -347,16 +316,10 @@ class Acrobat_AanOptode(object):
 		rawdata['AirSaturation[%]'] = pd.to_numeric(rawdata['AirSaturation[%]'],errors='coerce',downcast='integer')
 		rawdata['Temperature[Deg.C]'] = pd.to_numeric(rawdata['Temperature[Deg.C]'],errors='coerce',downcast='integer')
 		rawdata = rawdata.set_index(pd.DatetimeIndex(rawdata['DateTime']))
-		return rawdata
 
-	@staticmethod	
-	def parse_second(fobj, **kwargs):
-		r"""
-		Method to parse gps data from ACROBAT after first pass
-		"""
-		rawdata = pd.read_csv(fobj)       
-		rawdata.DateTime = pd.to_datetime(rawdata.DateTime,format='%Y-%m-%d %H:%M:%S')
-		rawdata = rawdata.set_index(pd.DatetimeIndex(rawdata['DateTime']))
+		if kwargs['time_correction_seconds']:
+			rawdata['DateTime'] = rawdata['DateTime']+pd.Timedelta(seconds=kwargs['time_correction_seconds'])
+
 		return rawdata
 
 class Acrobat_System(object):
@@ -390,17 +353,12 @@ class Acrobat_System(object):
 		if kwargs['UTC_offset_corr']:
 			toff = str(kwargs['UTC_offset_corr']) + ' hours'
 			rawdata['DateTime'] = rawdata['DateTime']+pd.Timedelta(toff)
+
+		if kwargs['time_correction_seconds']:
+			rawdata['DateTime'] = rawdata['DateTime']+pd.Timedelta(seconds=kwargs['time_correction_seconds'])
+
 		rawdata = rawdata.set_index(pd.DatetimeIndex(rawdata['DateTime']))
 		rawdata.drop(['yyyy','ddd','gps time'], axis=1, inplace=True)
 		return rawdata
 
-	@staticmethod	
-	def parse_second(fobj, **kwargs):
-		r"""
-		Method to parse gps data from ACROBAT after first pass
-		"""
-		rawdata = pd.read_csv(fobj)       
-		rawdata.DateTime = pd.to_datetime(rawdata.DateTime,format='%Y-%m-%d %H:%M:%S')
-		rawdata = rawdata.set_index(pd.DatetimeIndex(rawdata['DateTime']))
-		return rawdata
 

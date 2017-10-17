@@ -12,7 +12,6 @@
  
  History:
  --------
- 2017-03-16 - S.BELL: Add second pass option to files
 
 """
 
@@ -52,50 +51,64 @@ if args.Instrument in ['GPS','gps']:
 	instid = 'gps'
 	rawdata = ACROBAT_data_read.get_inst_data(args.DataPath, source=instid)
 	for index, row in rawdata.iterrows():
-		EcoFOCI_db.add_to_DB(table=state_config['db_table'][instid],verbose=True,
+		try:
+			EcoFOCI_db.add_to_DB(table=state_config['db_table'][instid],verbose=True,
 																  PCTime=row['PCTime'],
 																  GPSTime=row['DateTime'],
 																  Latitude=row['Latitude'],
 																  Longitude=row['Longitude'],
 																  Spd_Over_Grnd=row['SOG'])
-
+		except:
+			pass
 elif args.Instrument in ['fastcat','FastCAT','sbe49']:
 	instid = 'ctd'
 	rawdata = ACROBAT_data_read.get_inst_data(args.DataPath, source=instid)
 	rawdata = rawdata.where((pd.notnull(rawdata)), None)
 	for index, row in rawdata.iterrows():
-		EcoFOCI_db.add_to_DB(table=state_config['db_table'][instid],verbose=False,pctime=row['DateTime'],
+		try:
+			EcoFOCI_db.add_to_DB(table=state_config['db_table'][instid],verbose=False,pctime=row['DateTime'],
 																				  temperature=row['Temperature'],
 																				  conductivity=row['Conductivity'],
 																				  pressure=row['Pressure'])
+		except:
+			pass
+
 elif args.Instrument in ['TSG']:
 	instid = 'tsg'
 	rawdata = ACROBAT_data_read.get_inst_data(args.DataPath, source=instid)
 	rawdata = rawdata.where((pd.notnull(rawdata)), None)
 	for index, row in rawdata.iterrows():
-		EcoFOCI_db.add_to_DB(table=state_config['db_table'][instid],verbose=False,PCTime=row['DateTime'],
+		try:
+			EcoFOCI_db.add_to_DB(table=state_config['db_table'][instid],verbose=False,PCTime=row['DateTime'],
 																				  Temperature=row['Temperature'],
 																				  Conductivity=row['Conductivity'],
 																				  Salinity=row['Salinity'])
-
+		except:
+			pass
 
 elif args.Instrument in ['ECOTriplet','triplet','wetlabs']:
 	instid = 'triplet'
 	rawdata = ACROBAT_data_read.get_inst_data(args.DataPath, source=instid)
 	rawdata = rawdata.where((pd.notnull(rawdata)), None)
 	for index, row in rawdata.iterrows():
-		EcoFOCI_db.add_to_DB(table=state_config['db_table'][instid],verbose=False,pctime=row['DateTime'],
+		try:
+			EcoFOCI_db.add_to_DB(table=state_config['db_table'][instid],verbose=False,pctime=row['DateTime'],
 																				  sig700nm=row['700nm'],
 																				  sig695nm=row['695nm'],
 																				  sig460nm=row['460nm'])
+		except:
+			pass
 
 elif args.Instrument in ['ECO']:
 	instid = 'eco'
 	rawdata = ACROBAT_data_read.get_inst_data(args.DataPath, source=instid)
 	rawdata = rawdata.where((pd.notnull(rawdata)), None)
 	for index, row in rawdata.iterrows():
-		EcoFOCI_db.add_to_DB(table=state_config['db_table'][instid],verbose=False,pctime=row['DateTime'],
+		try:
+			EcoFOCI_db.add_to_DB(table=state_config['db_table'][instid],verbose=False,pctime=row['DateTime'],
 																				  sig695nm=row['695nm'])
+		except:
+			pass
 
 elif args.Instrument in ['ACROBAT','acrobat']:
 	rawdata = ACROBAT_data_read.get_inst_data(args.DataPath, source=Acrobat_System, UTC_offset_corr=7)
