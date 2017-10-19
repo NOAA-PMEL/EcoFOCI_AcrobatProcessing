@@ -46,7 +46,7 @@ elif args.Instrument in ['ECO']:
 	rawdata = ACROBAT_data_read.get_inst_data(args.DataPath, source='ECO', time_correction_seconds=args.timecorr)
 	print rawdata.resample(args.averaging_string,label='right',closed='right').mean().to_csv()
 elif args.Instrument in ['ACROBAT','acrobat']:
-	rawdata = ACROBAT_data_read.get_inst_data(args.DataPath, source='acrobat', , time_correction_seconds=args.timecorr, UTC_offset_corr=7)
+	rawdata = ACROBAT_data_read.get_inst_data(args.DataPath, source='acrobat', time_correction_seconds=args.timecorr, UTC_offset_corr=7)
 	print rawdata.resample(args.averaging_string,label='right',closed='right').mean().to_csv()
 elif args.Instrument in ['AanOptode','optode']:
 	rawdata = ACROBAT_data_read.get_inst_data(args.DataPath, source='optode', time_correction_seconds=args.timecorr)
