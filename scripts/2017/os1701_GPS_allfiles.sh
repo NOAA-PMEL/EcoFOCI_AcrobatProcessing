@@ -12,5 +12,5 @@ do
     names=(${files//\// })
     outfile=${names[${#names[@]} - 1]}
     #echo "processing file: $files"
-    python ${prog_dir}ACROBAT_raw2csv.py ${files} GPS -avestring 60s
+    python ${prog_dir}ACROBAT_raw2csv.py ${files} GPS -timecorr 30 -avestring 60s
 done

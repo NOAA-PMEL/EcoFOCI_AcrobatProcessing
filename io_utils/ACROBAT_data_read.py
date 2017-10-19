@@ -274,7 +274,7 @@ class Acrobat_ECO(object):
 		#columns = ['DateTime','EcoDate','EcoTime','700nm','695nm','460nm']
 		#columns_ind = [0,1,2,4,6,8]
 		##use following if gps feed exists... rely on gps for time syncing
-		columns = ['DateTime','695']
+		columns = ['DateTime','695nm']
 		columns_ind = [0,4]		
 
 		rawdata = pd.read_csv(fobj, names=columns, usecols=columns_ind,sep='\s+|,',engine='python', error_bad_lines=False)       
