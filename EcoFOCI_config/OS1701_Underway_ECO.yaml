@@ -1,0 +1,19 @@
+---
+time:
+  name: time
+  generic_name: time
+  longname: date and time since reference time
+  time_origin: '1900-01-01 00:00:00'
+  units: 'minutes since 1900-01-01T00:00:00Z'
+Chlorophyll: 
+  name: Chlorophyll
+  generic_name: chl
+  units: ugrams/l
+  longname: 'Chlorophyll A'
+  instrument: WetLabs
+eng_Chlorophyll_counts: 
+  name: eng_Chlorophyll_counts
+  generic_name: chl_counts
+  units: ''
+  longname: '695nm counts'
+  instrument: WetLabs  

@@ -1,0 +1,22 @@
+---
+time:
+  name: time
+  generic_name: time
+  longname: date and time since reference time
+  time_origin: '1900-01-01 00:00:00'
+  units: 'minutes since 1900-01-01T00:00:00Z'
+latitude:
+  name: latitude
+  generic_name: latitude
+  units: degrees_north
+  longname: 'latitude'
+longitude:
+  name: longitude
+  generic_name: longitude
+  units: degrees_north
+  longname: 'longitude'
+speed_over_ground:
+  name: speed_over_ground
+  generic_name: SOG
+  units: m/s
+  longname: 'speed over ground (m/s)'

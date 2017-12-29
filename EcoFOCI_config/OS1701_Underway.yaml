@@ -1,0 +1,58 @@
+---
+time:
+  name: time
+  generic_name: time
+  longname: date and time since reference time
+  time_origin: '1900-01-01 00:00:00'
+  units: 'minutes since 1900-01-01T00:00:00Z'
+Salinity: 
+  name: Salinity
+  generic_name: sal
+  units: psu
+  longname: 'SALINITY (PSU)'
+  instrument: CTD
+Conductivity: 
+  name: Conductivity
+  generic_name: cond
+  units: S/m
+  longname: 'Conductivity (S/m)'
+  instrument: CTD
+Temperature: 
+  name: Temperature
+  generic_name: temp
+  units: C
+  longname: 'TEMPERATURE (C)'
+  instrument: CTD
+Chlorophyll: 
+  name: Chlorophyll
+  generic_name: chl
+  units: ugrams/l
+  longname: 'Chlorophyll A'
+  instrument: WetLabs
+eng_Chlorophyll_counts: 
+  name: eng_Chlorophyll_counts
+  generic_name: chl_counts
+  units: 
+  longname: '695nm counts'
+  instrument: WetLabs  
+SigmaT: 
+  name: SigmaT
+  generic_name: den
+  units: kg m-3
+  longname: 'SIGMA-T (KG/M**3)'
+  instrument: derived
+latitude:
+  name: latitude
+  generic_name: latitude
+  units: degrees_north
+  longname: 'latitude'
+longitude:
+  name: longitude
+  generic_name: longitude
+  units: degrees_north
+  longname: 'longitude'
+speed_over_ground:
+  name: speed_over_ground
+  generic_name: SOG
+  units: m/s
+  longname: 'speed over ground (m/s)'
