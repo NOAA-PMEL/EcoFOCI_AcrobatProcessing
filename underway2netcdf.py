@@ -34,12 +34,12 @@ __status__   = "Development"
 
 """-------------------------------------- Main ----------------------------------------------"""
 
-parser = argparse.ArgumentParser(description='RUDICS PICO Prawler Data File')
-parser.add_argument('DataPath', metavar='DataPath', type=str,
+parser = argparse.ArgumentParser(description='ACROBAT/UNDERWAY NetCDF Creation')
+parser.add_argument('DataPath', metavar='DataPath', type=str, 
                help='full path to file')
-parser.add_argument('ConfigFile', metavar='ConfigFile', type=str,
+parser.add_argument('ConfigFile', type=str,
                help='full path to nc config file')
-parser.add_argument('OutPreFix', metavar='OutPreFix', type=str,
+parser.add_argument('OutPreFix', type=str,
                help='prefix for output file')
 parser.add_argument('-is1D','--is1D', action="store_true",
                help='1D ragged arrays')
