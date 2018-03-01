@@ -1,0 +1,86 @@
+---
+time:
+  name: time
+  generic_name: time
+  longname: date and time since reference time
+  time_origin: '1900-01-01 00:00:00'
+  units: 'hours since 1900-01-01T00:00:00Z'
+Salinity: 
+  name: Salinity
+  generic_name: sal
+  units: psu
+  longname: 'SALINITY (PSU)'
+  instrument: CTD
+Conductivity: 
+  name: Conductivity
+  generic_name: cond
+  units: S/m
+  longname: 'Conductivity (S/m)'
+  instrument: CTD
+Pressure: 
+  name: Pressure
+  generic_name: press
+  units: dbar
+  longname: 'Pressure (dbar)'
+  instrument: CTD
+Temperature: 
+  name: Temperature
+  generic_name: temp
+  units: C
+  longname: 'TEMPERATURE (C)'
+  instrument: CTD
+Temperature_Optode: 
+  name: 'Temperature from Aandera Optode'
+  generic_name: temp
+  units: C
+  longname: 'TEMPERATURE (C)'
+  instrument: 'Aandera Optode'  
+eng_700nm_counts: 
+  name: eng700nm
+  generic_name: 700nm
+  units: counts
+  longname: 'Counts from 700nm channel'
+  instrument: 'WetLabs EcoTriplet'
+eng_695nm_counts: 
+  name: eng695nm
+  generic_name: 695nm
+  units: counts
+  longname: 'Counts from 695nm channel'
+  instrument: 'WetLabs EcoTriplet'
+eng_460nm_counts: 
+  name: eng460nm
+  generic_name: 460nm
+  units: counts
+  longname: 'Counts from 460nm channel'
+  instrument: 'WetLabs EcoTriplet'  
+SigmaT: 
+  name: SigmaT
+  generic_name: den
+  units: kg m-3
+  longname: 'SIGMA-T (KG/M**3)'
+  instrument: derived
+latitude:
+  name: latitude
+  generic_name: latitude
+  units: degrees_north
+  longname: 'latitude'
+longitude:
+  name: longitude
+  generic_name: longitude
+  units: degrees_north
+  longname: 'longitude'
+speed_over_ground:
+  name: speed_over_ground
+  generic_name: SOG
+  units: m/s
+  longname: 'speed over ground (m/s)'
+oxygen_concentration:
+  name: oxygen concentration
+  generic_name: O2Conc
+  units: uM
+  longname: 'Oxygen Concentration in [uM] from Aandera Optode'
+oxygen_airsaturation:
+  name: 'oxygen air saturation'
+  generic_name: O2Sat
+  units: percent
+  longname: 'Oxygen Saturation over Air in % from Aandera Optode'  

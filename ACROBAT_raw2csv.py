@@ -34,13 +34,13 @@ if args.Instrument in ['GPS','gps']:
 	rawdata = ACROBAT_data_read.get_inst_data(args.DataPath, source='gps', time_correction_seconds=args.timecorr)
 	print rawdata.resample(args.averaging_string,label='right',closed='right').mean().to_csv()
 elif args.Instrument in ['fastcat','FastCAT']:
-	rawdata = ACROBAT_data_read.get_inst_data(args.DataPath, source='fastcat', time_correction_seconds=args.timecorr)
+	rawdata = ACROBAT_data_read.get_inst_data(args.DataPath, source='ctd', time_correction_seconds=args.timecorr)
 	print rawdata.resample(args.averaging_string,label='right',closed='right').mean().to_csv()
 elif args.Instrument in ['TSG']:
 	rawdata = ACROBAT_data_read.get_inst_data(args.DataPath, source='tsg', time_correction_seconds=args.timecorr)
 	print rawdata.resample(args.averaging_string,label='right',closed='right').mean().to_csv()
-elif args.Instrument in ['ECOTriplet']:
-	rawdata = ACROBAT_data_read.get_inst_data(args.DataPath, source='ECOTriplet', time_correction_seconds=args.timecorr)
+elif args.Instrument in ['ECOTriplet','Triplet']:
+	rawdata = ACROBAT_data_read.get_inst_data(args.DataPath, source='triplet', time_correction_seconds=args.timecorr)
 	print rawdata.resample(args.averaging_string,label='right',closed='right').mean().to_csv()
 elif args.Instrument in ['ECO']:
 	rawdata = ACROBAT_data_read.get_inst_data(args.DataPath, source='eco', time_correction_seconds=args.timecorr)

@@ -29,7 +29,7 @@ def available_data_sources():
 	r"""List of acronyms and options for names for instruments"""
 	sources = {
 			   'gps':Acrobat_GPS,'ctd':Acrobat_FastCAT,'triplet':Acrobat_ECOTriplet,
-			   'tsg':Acrobat_TSG,'eco':Acrobat_ECO
+			   'tsg':Acrobat_TSG,'eco':Acrobat_ECO,'optode':Acrobat_AanOptode
 			   }
 	return sources
 
