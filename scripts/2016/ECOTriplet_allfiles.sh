@@ -14,5 +14,5 @@ do
     names=(${files//\// })
     outfile=${names[${#names[@]} - 1]}
     #echo "processing file: $files"
-    python ${prog_dir}ACROBAT_data_read.py ${files} ECOTriplet
+    python ${prog_dir}ACROBAT_raw2csv.py ${files} ECOTriplet
 done

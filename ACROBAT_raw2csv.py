@@ -13,6 +13,10 @@
  History:
  --------
 
+ Compatibility:
+ ==============
+ python >=3.6 - not tested, will fail due to print statements
+ python 2.7 - ok
 """
 
 import argparse
