@@ -16,7 +16,7 @@ SBE_Cond_Coeffs:
   CTcor: +3.2500e-006
   Serial_Number: Unknown
 
-Wetlabs_CHL_Coeffs:
+Wetlabs_695nm_Coeffs:
   ScaleFactor: 0.0186
   DarkCounts: 54
   Units: microgram/liter
@@ -42,9 +42,3 @@ Downward_PAR:
 OxygenSensor:
   Serial_Number: 602
 
-db_table: 
-  gps: aq1601_gps
-  ctd: aq1601_ctd
-  suna: aq1601_suna
-  triplet: aq1601_triplet
-  oxy: aq1601_oxy
